@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  kernel_100:
+  kernel_e100:
     docker:
       - image: lochnair/octeon-buildenv:latest
     working_directory: /build/
@@ -66,7 +66,7 @@ jobs:
           root: /build
           paths:
             - kernel_e200
-  kernel_300:
+  kernel_e300:
     docker:
       - image: lochnair/octeon-buildenv:latest
     working_directory: /build/
@@ -99,7 +99,7 @@ jobs:
           root: /build
           paths:
             - kernel_e300
-  kernel_1000:
+  kernel_e1000:
     docker:
       - image: lochnair/octeon-buildenv:latest
     working_directory: /build/
