@@ -53,7 +53,7 @@ jobs:
       - store_artifacts:
           path: /build/e200-ksrc.tar.bz2
       - run:
-          command: git clone -b v0.0.20200215 git://git.zx2c4.com/wireguard-linux-compat
+          command: git clone -b v0.0.20200215 git://git.zx2c4.com/wireguard-linux-compat .
           working_directory: /build/module_e200
       - run:
           command: curl -L https://gist.githubusercontent.com/Lochnair/805bf9ab96742d0fe1c25e4130268307/raw/29e37d43a5247a3f2584ef0d6d553ee9a4532e12/only-use-__vmalloc-for-now.patch | patch compat.h
