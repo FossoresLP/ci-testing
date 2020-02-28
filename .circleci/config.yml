@@ -9,7 +9,7 @@ jobs:
       - run: su-exec root apt-get -y install bc bison flex curl
       - run: curl -o source.tar.bz2 https://dl.ui.com/firmwares/edgemax/v2.0.8/gpl/GPL.ER-e200.v2.0.8.5247496.tar.bz2
       - run: tar -xf source.tar.bz2
-      - run: make ARCH=mips ubnt_er_e200_defconfig
+      #- run: make ARCH=mips ubnt_er_e200_defconfig
       - run: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
       - run: rm -rf tmp && mkdir tmp
       - run: tar --exclude-vcs --exclude=tmp -cf tmp/e200-ksrc.tar .
