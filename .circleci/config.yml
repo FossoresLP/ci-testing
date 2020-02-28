@@ -1,6 +1,39 @@
 version: 2
 jobs:
-  build:
+  kernel_100:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - run:
+          command: su-exec root apt-get update
+          working_directory: /build/kernel_e100
+      - run:
+          command: su-exec root apt-get -y install bc bison flex git
+          working_directory: /build/kernel_e100
+      - run:
+          command: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e100.git .
+          working_directory: /build/kernel_e100
+      - run:
+          command: make ARCH=mips ubnt_er_e100_defconfig
+          working_directory: /build/kernel_e100
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
+          working_directory: /build/kernel_e100
+      - run:
+          command: rm -rf tmp && mkdir tmp
+          working_directory: /build/kernel_e100
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
+          working_directory: /build/kernel_e100
+      - run:
+          command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e100
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - kernel_e100
+  kernel_e200:
     docker:
       - image: lochnair/octeon-buildenv:latest
     working_directory: /build/
@@ -24,48 +57,190 @@ jobs:
           command: rm -rf tmp && mkdir tmp
           working_directory: /build/kernel_e200
       - run:
-          command: tar --exclude-vcs --exclude=tmp -cf tmp/e200-ksrc.tar .
-          working_directory: /build/kernel_e200
-      - run:
-          command: mv tmp/e200-ksrc.tar e200-ksrc.tar
-          working_directory: /build/kernel_e200
-      - run:
           command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
-          working_directory: /build/kernel_e200
-      - run:
-          command: mv -v vmlinux vmlinux.64
-          working_directory: /build/kernel_e200
-      - run:
-          command: tar cvjf e200-kernel.tar.bz2 vmlinux.64
           working_directory: /build/kernel_e200
       - run:
           command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
           working_directory: /build/kernel_e200
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - kernel_e200
+  kernel_300:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
       - run:
-          command: tar cvjf e200-modules.tar.bz2 -C destdir .
-          working_directory: /build/kernel_e200
+          command: su-exec root apt-get update
+          working_directory: /build/kernel_e300
       - run:
-          command: tar -uvf e200-ksrc.tar Module.symvers
-          working_directory: /build/kernel_e200
+          command: su-exec root apt-get -y install bc bison flex git
+          working_directory: /build/kernel_e300
       - run:
-          command: bzip2 e200-ksrc.tar
-          working_directory: /build/kernel_e200
-      - store_artifacts:
-          path: /build/e200-ksrc.tar.bz2
+          command: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e300.git .
+          working_directory: /build/kernel_e300
+      - run:
+          command: make ARCH=mips ubnt_er_e300_defconfig
+          working_directory: /build/kernel_e300
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
+          working_directory: /build/kernel_e300
+      - run:
+          command: rm -rf tmp && mkdir tmp
+          working_directory: /build/kernel_e300
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
+          working_directory: /build/kernel_e300
+      - run:
+          command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e300
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - kernel_e300
+  kernel_1000:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - run:
+          command: su-exec root apt-get update
+          working_directory: /build/kernel_e1000
+      - run:
+          command: su-exec root apt-get -y install bc bison flex git
+          working_directory: /build/kernel_e1000
+      - run:
+          command: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e1000.git .
+          working_directory: /build/kernel_e1000
+      - run:
+          command: make ARCH=mips ubnt_er_e1000_defconfig
+          working_directory: /build/kernel_e1000
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
+          working_directory: /build/kernel_e1000
+      - run:
+          command: rm -rf tmp && mkdir tmp
+          working_directory: /build/kernel_e1000
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
+          working_directory: /build/kernel_e1000
+      - run:
+          command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e1000
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - kernel_e1000
+  clone_module:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
       - run:
           command: git clone -b v0.0.20200215 git://git.zx2c4.com/wireguard-linux-compat .
-          working_directory: /build/module_e200
+          working_directory: /build/module
       - run:
           command: curl -L https://gist.githubusercontent.com/Lochnair/805bf9ab96742d0fe1c25e4130268307/raw/29e37d43a5247a3f2584ef0d6d553ee9a4532e12/only-use-__vmalloc-for-now.patch | patch compat.h
-          working_directory: /build/module_e200/src/compat
+          working_directory: /build/module/src/compat
       - run:
           command: sed -i 's/ --dirty//g' src/Makefile
-          working_directory: /build/module_e200
+          working_directory: /build/module
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module
+  module_e100:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
       - run:
-          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=/build/kernel_e200 module
-          working_directory: /build/module_e200/src
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=/build/kernel_e100 module
+          working_directory: /build/module/src
       - run:
           command: mips64-octeon-linux-strip --strip-debug wireguard.ko
-          working_directory: /build/module_e200/src
+          working_directory: /build/module/src
       - store_artifacts:
-          path: /build/module_e200/src/wireguard.ko
+          path: /build/module/src/wireguard.ko
+          destination: wireguard_e100.ko
+  module_e200:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=/build/kernel_e200 module
+          working_directory: /build/module/src
+      - run:
+          command: mips64-octeon-linux-strip --strip-debug wireguard.ko
+          working_directory: /build/module/src
+      - store_artifacts:
+          path: /build/module/src/wireguard.ko
+          destination: wireguard_e200.ko
+  module_e300:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=/build/kernel_e300 module
+          working_directory: /build/module/src
+      - run:
+          command: mips64-octeon-linux-strip --strip-debug wireguard.ko
+          working_directory: /build/module/src
+      - store_artifacts:
+          path: /build/module/src/wireguard.ko
+          destination: wireguard_e300.ko
+  module_e1000:
+    docker:
+      - image: lochnair/octeon-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=/build/kernel_e1000 module
+          working_directory: /build/module/src
+      - run:
+          command: mips64-octeon-linux-strip --strip-debug wireguard.ko
+          working_directory: /build/module/src
+      - store_artifacts:
+          path: /build/module/src/wireguard.ko
+          destination: wireguard_e1000.ko
+
+workflows:
+  version: 2
+
+  build_modules:
+    jobs:
+      - kernel_e100
+      - kernel_e200
+      - kernel_e300
+      - kernel_e1000
+      - clone_module:
+          requires:
+            - kernel_e100
+            - kernel_e200
+            - kernel_e300
+            - kernel_e1000
+      - module_e100:
+          requires:
+            - clone_module
+      - module_e200:
+          requires:
+            - clone_module
+      - module_e300:
+          requires:
+            - clone_module
+      - module_e1000:
+          requires:
+            - clone_module
