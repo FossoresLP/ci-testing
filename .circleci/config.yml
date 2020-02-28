@@ -7,8 +7,7 @@ jobs:
     steps:
       - run: su-exec root apt-get update
       - run: su-exec root apt-get -y install bc bison flex git
-      - run: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e200.git
-      - run: tar -xf source.tar.bz2
+      - run: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e200.git .
       - run: make ARCH=mips ubnt_er_e200_defconfig
       - run: make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
       - run: rm -rf tmp && mkdir tmp
