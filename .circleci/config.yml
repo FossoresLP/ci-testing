@@ -325,7 +325,7 @@ jobs:
     working_directory: /build/
     steps:
       - run: apt-get update
-      - run: apt-get -y ca-certificates
+      - run: apt-get -y install ca-certificates
       - attach_workspace:
           at: /build
       - store_artifacts:
