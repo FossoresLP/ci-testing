@@ -29,6 +29,9 @@ jobs:
       - run:
           command: make ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- INSTALL_MOD_PATH=destdir modules_install
           working_directory: /build/kernel_e50
+      - run:
+          command: rm -rf .git Documentation
+          working_directory: /build/kernel_e50
       - persist_to_workspace:
           root: /build
           paths:
@@ -61,6 +64,9 @@ jobs:
           working_directory: /build/kernel_e100
       - run:
           command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e100
+      - run:
+          command: rm -rf .git Documentation
           working_directory: /build/kernel_e100
       - persist_to_workspace:
           root: /build
@@ -95,6 +101,9 @@ jobs:
       - run:
           command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
           working_directory: /build/kernel_e200
+      - run:
+          command: rm -rf .git Documentation
+          working_directory: /build/kernel_e200
       - persist_to_workspace:
           root: /build
           paths:
@@ -128,6 +137,9 @@ jobs:
       - run:
           command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
           working_directory: /build/kernel_e300
+      - run:
+          command: rm -rf .git Documentation
+          working_directory: /build/kernel_e300
       - persist_to_workspace:
           root: /build
           paths:
@@ -160,6 +172,9 @@ jobs:
           working_directory: /build/kernel_e1000
       - run:
           command: make ARCH=mips CROSS_COMPILE=mips64-octeon-linux- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e1000
+      - run:
+          command: rm -rf .git Documentation
           working_directory: /build/kernel_e1000
       - persist_to_workspace:
           root: /build
