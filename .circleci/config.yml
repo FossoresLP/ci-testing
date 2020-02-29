@@ -329,6 +329,9 @@ jobs:
       - attach_workspace:
           at: /build
       - store_artifacts:
+          path: /build/module/src/wireguard_e50.ko
+          destination: wireguard_e50.ko
+      - store_artifacts:
           path: /build/module/src/wireguard_e100.ko
           destination: wireguard_e100.ko
       - store_artifacts:
