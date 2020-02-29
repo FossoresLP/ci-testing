@@ -1,5 +1,38 @@
 version: 2
 jobs:
+  kernel_e50:
+    docker:
+      - image: lochnair/debian-crossenv:mipsel
+    working_directory: /build/
+    steps:
+      - run:
+          command: su-exec root apt-get update
+          working_directory: /build/kernel_e50
+      - run:
+          command: su-exec root apt-get -y install bc bison flex git
+          working_directory: /build/kernel_e50
+      - run:
+          command: git clone -b v2.0.8/master https://github.com/Lochnair/kernel_e50.git .
+          working_directory: /build/kernel_e50
+      - run:
+          command: make ARCH=mips ubnt_er_e50_defconfig
+          working_directory: /build/kernel_e50
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
+          working_directory: /build/kernel_e50
+      - run:
+          command: rm -rf tmp && mkdir tmp
+          working_directory: /build/kernel_e50
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
+          working_directory: /build/kernel_e50
+      - run:
+          command: make ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- INSTALL_MOD_PATH=destdir modules_install
+          working_directory: /build/kernel_e50
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - kernel_e50
   kernel_e100:
     docker:
       - image: lochnair/octeon-buildenv:latest
@@ -150,6 +183,26 @@ jobs:
           root: /build
           paths:
             - module
+  module_e50:
+    docker:
+      - image: lochnair/mtk-buildenv:latest
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
+      - run:
+          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- KERNELDIR=/build/kernel_e50 module
+          working_directory: /build/module/src
+      - run:
+          command: mipsel-mtk-linux-strip --strip-debug wireguard.ko
+          working_directory: /build/module/src
+      - run:
+          command: mv wireguard.ko wireguard_e50.ko
+          working_directory: /build/module/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module/src/wireguard_e50.ko
   module_e100:
     docker:
       - image: lochnair/octeon-buildenv:latest
@@ -297,11 +350,16 @@ workflows:
 
   build_modules:
     jobs:
+      - kernel_e50
       - kernel_e100
       - kernel_e200
       - kernel_e300
       - kernel_e1000
       - clone_module
+      - module_e50:
+          requires:
+            - clone_module
+            - kernel_e50
       - module_e100:
           requires:
             - clone_module
@@ -322,6 +380,7 @@ workflows:
       - tools_mipsel
       - package:
           requires:
+            - module_e50
             - module_e100
             - module_e200
             - module_e300
