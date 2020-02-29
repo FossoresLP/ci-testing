@@ -244,9 +244,6 @@ jobs:
       - run:
           command: mips-linux-musl-strip --strip-unneeded wg
           working_directory: /build/tools-mips/src
-      - run:
-          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
-          working_directory: /build/tools-mips/src
       - persist_to_workspace:
           root: /build
           paths:
@@ -264,9 +261,6 @@ jobs:
           working_directory: /build/tools-mipsel/src
       - run:
           command: mipsel-linux-musl-strip --strip-unneeded wg
-          working_directory: /build/tools-mipsel/src
-      - run:
-          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
           working_directory: /build/tools-mipsel/src
       - persist_to_workspace:
           root: /build
