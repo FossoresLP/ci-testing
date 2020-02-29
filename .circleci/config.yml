@@ -137,8 +137,6 @@ jobs:
       - image: lochnair/octeon-buildenv:latest
     working_directory: /build/
     steps:
-      - attach_workspace:
-          at: /build
       - run:
           command: git clone -b v0.0.20200215 git://git.zx2c4.com/wireguard-linux-compat .
           working_directory: /build/module
@@ -165,9 +163,13 @@ jobs:
       - run:
           command: mips64-octeon-linux-strip --strip-debug wireguard.ko
           working_directory: /build/module/src
-      - store_artifacts:
-          path: /build/module/src/wireguard.ko
-          destination: wireguard_e100.ko
+      - run:
+          command: mv wireguard.ko wireguard_e100.ko
+          working_directory: /build/module/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module/src/wireguard_e100.ko
   module_e200:
     docker:
       - image: lochnair/octeon-buildenv:latest
@@ -181,9 +183,13 @@ jobs:
       - run:
           command: mips64-octeon-linux-strip --strip-debug wireguard.ko
           working_directory: /build/module/src
-      - store_artifacts:
-          path: /build/module/src/wireguard.ko
-          destination: wireguard_e200.ko
+      - run:
+          command: mv wireguard.ko wireguard_e200.ko
+          working_directory: /build/module/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module/src/wireguard_e200.ko
   module_e300:
     docker:
       - image: lochnair/octeon-buildenv:latest
@@ -197,9 +203,13 @@ jobs:
       - run:
           command: mips64-octeon-linux-strip --strip-debug wireguard.ko
           working_directory: /build/module/src
-      - store_artifacts:
-          path: /build/module/src/wireguard.ko
-          destination: wireguard_e300.ko
+      - run:
+          command: mv wireguard.ko wireguard_e300.ko
+          working_directory: /build/module/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module/src/wireguard_e300.ko
   module_e1000:
     docker:
       - image: lochnair/octeon-buildenv:latest
@@ -213,9 +223,80 @@ jobs:
       - run:
           command: mips64-octeon-linux-strip --strip-debug wireguard.ko
           working_directory: /build/module/src
+      - run:
+          command: mv wireguard.ko wireguard_e1000.ko
+          working_directory: /build/module/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - module/src/wireguard_e1000.ko
+  tools_mips:
+    docker:
+      - image: lochnair/musl-buildenv:mips
+    working_directory: /build/
+    steps:
+      - run:
+          command: git clone -b v1.0.20200206 git://git.zx2c4.com/wireguard-tools .
+          working_directory: /build/tools-mips
+      - run:
+          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
+          working_directory: /build/tools-mips/src
+      - run:
+          command: mips-linux-musl-strip --strip-unneeded wg
+          working_directory: /build/tools-mips/src
+      - run:
+          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
+          working_directory: /build/tools-mips/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - tools-mips/src/wg
+  tools_mipsel:
+    docker:
+      - image: lochnair/musl-buildenv:mipsel
+    working_directory: /build/
+    steps:
+      - run:
+          command: git clone -b v1.0.20200206 git://git.zx2c4.com/wireguard-tools .
+          working_directory: /build/tools-mipsel
+      - run:
+          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
+          working_directory: /build/tools-mipsel/src
+      - run:
+          command: mips-linux-musl-strip --strip-unneeded wg
+          working_directory: /build/tools-mipsel/src
+      - run:
+          command: CC="mips-linux-musl-gcc" LDLIBS="-static" make -j5
+          working_directory: /build/tools-mipsel/src
+      - persist_to_workspace:
+          root: /build
+          paths:
+            - tools-mipsel/src/wg
+  package:
+    docker:
+      - image: debian
+    working_directory: /build/
+    steps:
+      - attach_workspace:
+          at: /build
       - store_artifacts:
-          path: /build/module/src/wireguard.ko
+          path: /build/module/src/wireguard_e100.ko
+          destination: wireguard_e100.ko
+      - store_artifacts:
+          path: /build/module/src/wireguard_e200.ko
+          destination: wireguard_e200.ko
+      - store_artifacts:
+          path: /build/module/src/wireguard_e300.ko
+          destination: wireguard_e300.ko
+      - store_artifacts:
+          path: /build/module/src/wireguard_e1000.ko
           destination: wireguard_e1000.ko
+      - store_artifacts:
+          path: /build/tools-mips/src/wg
+          destination: wg-mips
+      - store_artifacts:
+          path: /build/tools-mipsel/src/wg
+          destination: wg-mipsel
 
 workflows:
   version: 2
@@ -226,21 +307,30 @@ workflows:
       - kernel_e200
       - kernel_e300
       - kernel_e1000
-      - clone_module:
-          requires:
-            - kernel_e100
-            - kernel_e200
-            - kernel_e300
-            - kernel_e1000
+      - clone_module
       - module_e100:
           requires:
             - clone_module
+            - kernel_e100
       - module_e200:
           requires:
             - clone_module
+            - kernel_e200
       - module_e300:
           requires:
             - clone_module
+            - kernel_e300
       - module_e1000:
           requires:
             - clone_module
+            - kernel_e1000
+      - tools_mips
+      - tools_mipsel
+      - package:
+          requires:
+            - module_e100
+            - module_e200
+            - module_e300
+            - module_e1000
+            - tools_mips
+            - tools_mipsel
