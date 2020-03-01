@@ -2,7 +2,7 @@ version: 2
 jobs:
   kernel_e50:
     docker:
-      - image: lochnair/debian-crossenv:mipsel
+      - image: lochnair/mtk-buildenv:latest
     working_directory: /build/
     steps:
       - run:
@@ -18,16 +18,16 @@ jobs:
           command: make ARCH=mips ubnt_er_e50_defconfig
           working_directory: /build/kernel_e50
       - run:
-          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
+          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- prepare modules_prepare
           working_directory: /build/kernel_e50
       - run:
           command: rm -rf tmp && mkdir tmp
           working_directory: /build/kernel_e50
       - run:
-          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
+          command: make -j5 ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- vmlinux modules
           working_directory: /build/kernel_e50
       - run:
-          command: make ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- INSTALL_MOD_PATH=destdir modules_install
+          command: make ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- INSTALL_MOD_PATH=destdir modules_install
           working_directory: /build/kernel_e50
       - run:
           command: rm -rf .git Documentation
