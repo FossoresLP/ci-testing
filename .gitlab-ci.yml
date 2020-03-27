@@ -1,0 +1,70 @@
+variables:
+  E50_SRC: "HELLO WORLD"
+  E100_SRC: "HELLO WORLD"
+  E200_SRC: "HELLO WORLD"
+  E300_SRC: "HELLO WORLD"
+  E1000_SRC: "HELLO WORLD"
+
+stages:
+  - docker
+  - headers
+  - module
+
+docker-build-mipsel:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:mipsel" -f DOCKERFILE-mipsel .
+    - docker push "$CI_REGISTRY_IMAGE:mipsel"
+  only:
+    - master
+
+docker-build-mtk:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:mtk" -f DOCKERFILE-mtk .
+    - docker push "$CI_REGISTRY_IMAGE:mtk"
+  only:
+    - master
+
+docker-build-octeon:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:octeon" -f DOCKERFILE-octeon .
+    - docker push "$CI_REGISTRY_IMAGE:octeon"
+  only:
+    - master
+
+#headers-mipsel:
+#  image: $CI_REGISTRY_IMAGE:octeon
+#  stage: headers
+#  script:
+#    - apt-get -y update
+#    - apt-get -y install bc bison flex git
+#    - mkdir /build
+#    - mkdir $WORKSPACE/headers
+#    - cd /build
+#    - curl -o src.tar.bz2 $URL
+#    - tar -xf src.tar.bz2 $KERNEL
+#    - tar -xf $KERNEL
+#    - make ARCH=mips ubnt_er_e50_defconfig
+#    - make ARCH=mips O=$WORKSPACE/headers ubnt_er_e50_defconfig
+#    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
+#    - make -j5 ARCH=mips O=$WORKSPACE/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
+#    - rm -rf tmp && mkdir tmp
+#    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
+#    - cp Module.symvers $WORKSPACE/headers
