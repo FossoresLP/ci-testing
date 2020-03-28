@@ -1,5 +1,5 @@
 variables:
-  E50_SRC: "HELLO WORLD"
+  E50_SRC_2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e50.v2.0.8-hotfix.1.5278088.tar.bz2"
   E100_SRC: "HELLO WORLD"
   E200_SRC: "HELLO WORLD"
   E300_SRC: "HELLO WORLD"
@@ -10,7 +10,7 @@ stages:
   - headers
   - module
 
-docker-build-mipsel:
+docker:mipsel:
   image: docker:latest
   stage: docker
   services:
@@ -23,7 +23,7 @@ docker-build-mipsel:
   only:
     - master
 
-docker-build-mtk:
+docker:mtk:
   image: docker:latest
   stage: docker
   services:
@@ -36,7 +36,7 @@ docker-build-mtk:
   only:
     - master
 
-docker-build-octeon:
+docker:octeon:
   image: docker:latest
   stage: docker
   services:
@@ -49,22 +49,27 @@ docker-build-octeon:
   only:
     - master
 
-#headers-mipsel:
-#  image: $CI_REGISTRY_IMAGE:octeon
-#  stage: headers
-#  script:
-#    - apt-get -y update
-#    - apt-get -y install bc bison flex git
-#    - mkdir /build
-#    - mkdir $WORKSPACE/headers
-#    - cd /build
-#    - curl -o src.tar.bz2 $URL
-#    - tar -xf src.tar.bz2 $KERNEL
-#    - tar -xf $KERNEL
-#    - make ARCH=mips ubnt_er_e50_defconfig
-#    - make ARCH=mips O=$WORKSPACE/headers ubnt_er_e50_defconfig
-#    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
-#    - make -j5 ARCH=mips O=$WORKSPACE/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
-#    - rm -rf tmp && mkdir tmp
-#    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
-#    - cp Module.symvers $WORKSPACE/headers
+headers:e50:
+  image: $CI_REGISTRY_IMAGE:mipsel
+  stage: headers
+  script:
+    - apt-get -y update
+    - apt-get -y install bc bison flex git
+    - mkdir /build $CI_PROJECT_DIR/headers
+    - cd /build
+    - curl -o src.tar.bz2 $URL
+    - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
+    - mv kernel_* kernel.tar.gz
+    - tar -xf kernel.tar.gz
+    - make ARCH=mips ubnt_er_e50_defconfig
+    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_e50_defconfig
+    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
+    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
+    - rm -rf tmp && mkdir tmp
+    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
+    - cp Module.symvers $CI_PROJECT_DIR/headers
+  dependencies:
+    - docker:mipsel
+  artifacts:
+    paths:
+      - headers/
