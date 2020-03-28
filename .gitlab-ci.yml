@@ -60,7 +60,7 @@ headers:e50:v2:
     - curl -o src.tar.bz2 $E50_SRC_v2
     - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
     - mv kernel_* kernel.tar.gz
-    - tar -xf kernel.tar.gz
+    - tar -xf kernel.tar.gz --strip-components 1
     - make ARCH=mips ubnt_er_e50_defconfig
     - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_e50_defconfig
     - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
