@@ -1,5 +1,5 @@
 variables:
-  E50_SRC_2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e50.v2.0.8-hotfix.1.5278088.tar.bz2"
+  E50_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e50.v2.0.8-hotfix.1.5278088.tar.bz2"
   E100_SRC: "HELLO WORLD"
   E200_SRC: "HELLO WORLD"
   E300_SRC: "HELLO WORLD"
@@ -49,7 +49,7 @@ docker:octeon:
   only:
     - master
 
-headers:e50:
+headers:e50:v2:
   image: $CI_REGISTRY_IMAGE:mipsel
   stage: headers
   script:
@@ -57,7 +57,7 @@ headers:e50:
     - apt-get -y install bc bison flex git
     - mkdir /build $CI_PROJECT_DIR/headers
     - cd /build
-    - curl -o src.tar.bz2 $URL
+    - curl -o src.tar.bz2 $E50_SRC_v2
     - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz
