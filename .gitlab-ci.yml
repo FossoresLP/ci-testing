@@ -1,9 +1,14 @@
 variables:
+  E50_SRC_v1: "https://dl.ui.com/firmwares/edgemax/v1.10.11/gpl/GPL.ER-e50.v1.10.11.5274269.tar.bz2"
   E50_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e50.v2.0.8-hotfix.1.5278088.tar.bz2"
-  E100_SRC: "HELLO WORLD"
-  E200_SRC: "HELLO WORLD"
-  E300_SRC: "HELLO WORLD"
-  E1000_SRC: "HELLO WORLD"
+  E100_SRC_v1: "https://dl.ui.com/firmwares/edgemax/v1.10.11/gpl/GPL.ER-e100.v1.10.11.5274249.tar.bz2"
+  E100_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e100.v2.0.8-hotfix.1.5278088.tar.bz2"
+  E200_SRC_v1: "https://dl.ui.com/firmwares/edgemax/v1.10.11/gpl/GPL.ER-e200.v1.10.11.5274249.tar.bz2"
+  E200_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e200.v2.0.8-hotfix.1.5278088.tar.bz2"
+  E300_SRC_v1: "https://dl.ui.com/firmwares/edgemax/v1.10.11/gpl/GPL.ER-e300.v1.10.11.5274269.tar.bz2"
+  E300_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e300.v2.0.8-hotfix.1.5278088.tar.bz2"
+  E1000_SRC_v1: "https://dl.ui.com/firmwares/edgemax/v1.10.11/gpl/GPL.ER-e1000.v1.10.11.5274249.tar.bz2"
+  E1000_SRC_v2: "https://dl.ui.com/firmwares/edgemax/v2.0.8-hotfix.1/gpl/GPL.ER-e1000.v2.0.8-hotfix.1.5278088.tar.bz2"
 
 stages:
   - docker
@@ -22,6 +27,8 @@ docker:mipsel:
     - docker push "$CI_REGISTRY_IMAGE:mipsel"
   only:
     - master
+  when: manual
+  allow_failure: true
 
 docker:mtk:
   image: docker:latest
@@ -35,6 +42,8 @@ docker:mtk:
     - docker push "$CI_REGISTRY_IMAGE:mtk"
   only:
     - master
+  when: manual
+  allow_failure: true
 
 docker:octeon:
   image: docker:latest
@@ -48,6 +57,8 @@ docker:octeon:
     - docker push "$CI_REGISTRY_IMAGE:octeon"
   only:
     - master
+  when: manual
+  allow_failure: true
 
 headers:e50:v2:
   image: $CI_REGISTRY_IMAGE:mipsel
@@ -62,12 +73,12 @@ headers:e50:v2:
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz --strip-components 1
     - make ARCH=mips ubnt_er_e50_defconfig
-    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_e50_defconfig
     - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
-    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
-    - rm -rf tmp && mkdir tmp
     - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
     - cp Module.symvers $CI_PROJECT_DIR/headers
+    - make mrproper
+    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_e50_defconfig
+    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
   dependencies:
     - docker:mipsel
   artifacts:
