@@ -63,8 +63,7 @@ docker:octeon:
   when: manual
   allow_failure: true
 
-.headers:mipsel:
-  image: $CI_REGISTRY_IMAGE:mipsel
+.headers:base:
   stage: headers
   script:
     - mkdir /build $CI_PROJECT_DIR/headers
@@ -74,21 +73,45 @@ docker:octeon:
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz --strip-components 1
     - if [ $VERSION -ne 1 ]; then make ARCH=mips ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
-    - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
+    - make -j5 ARCH=mips CROSS_COMPILE=$CROSS prepare modules_prepare
+    - make -j5 ARCH=mips CROSS_COMPILE=$CROSS vmlinux modules
     - cp Module.symvers $CI_PROJECT_DIR/headers
     - make mrproper
     - if [ $VERSION -ne 1 ]; then make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
-  dependencies:
-    - docker:mipsel
+    - if [ $VERSION -eq 1 ]; then make oldconfig; fi;
+    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=$CROSS modules_prepare
   artifacts:
     paths:
       - headers/
 
-headers:e50:v1:
+.headers:mipsel:
+  extends: .headers:base
+  image: $CI_REGISTRY_IMAGE:mipsel
+  variables:
+    CROSS: mipsel-linux-gnu-
+  dependencies:
+    - docker:mipsel
+
+.headers:mtk:
+  extends: .headers:base
   image: $CI_REGISTRY_IMAGE:mtk
-  extends: .headers:mipsel
+  variables:
+    CROSS: mipsel-mtk-linux-
+  dependencies:
+    - docker:mtk
+
+.headers:octeon:
+  extends: .headers:base
+  image: $CI_REGISTRY_IMAGE:octeon
+  variables:
+    CROSS: mips64-octeon-linux-
+  dependencies:
+    - docker:octeon
+
+
+# E50
+headers:e50:v1:
+  extends: .headers:mtk
   variables:
     SOURCE: $E50_SRC_v1
     DEVICE: e50
@@ -101,29 +124,7 @@ headers:e50:v2:
     DEVICE: e50
     VERSION: 2
 
-.headers:octeon:
-  image: $CI_REGISTRY_IMAGE:octeon
-  stage: headers
-  script:
-    - mkdir /build $CI_PROJECT_DIR/headers
-    - cd /build
-    - curl -o src.tar.bz2 $SOURCE
-    - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
-    - mv kernel_* kernel.tar.gz
-    - tar -xf kernel.tar.gz --strip-components 1
-    - if [ $VERSION -ne 1 ]; then make ARCH=mips ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
-    - make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
-    - cp Module.symvers $CI_PROJECT_DIR/headers
-    - make mrproper
-    - if [ $VERSION -ne 1 ]; then make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mips64-octeon-linux- modules_prepare
-  dependencies:
-    - docker:octeon
-  artifacts:
-    paths:
-      - headers/
-
+# E100
 headers:e100:v1:
   extends: .headers:octeon
   variables:
@@ -138,6 +139,7 @@ headers:e100:v2:
     DEVICE: e100
     VERSION: 2
 
+# E200
 headers:e200:v1:
   extends: .headers:octeon
   variables:
@@ -152,6 +154,7 @@ headers:e200:v2:
     DEVICE: e200
     VERSION: 2
 
+# E300
 headers:e300:v1:
   extends: .headers:octeon
   variables:
@@ -166,6 +169,7 @@ headers:e300:v2:
     DEVICE: e300
     VERSION: 2
 
+# E1000
 headers:e1000:v1:
   extends: .headers:octeon
   variables:
@@ -180,6 +184,7 @@ headers:e1000:v2:
     DEVICE: e1000
     VERSION: 2
 
+# UGW3
 headers:ugw3:
   extends: .headers:octeon
   variables:
@@ -187,6 +192,7 @@ headers:ugw3:
     DEVICE: ugw3
     VERSION: 1
 
+# UGW4
 headers:ugw4:
   extends: .headers:octeon
   variables:
@@ -194,6 +200,7 @@ headers:ugw4:
     DEVICE: ugw4
     VERSION: 1
 
+# UGWXG
 headers:ugwxg:
   extends: .headers:octeon
   variables:
