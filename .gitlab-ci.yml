@@ -60,28 +60,40 @@ docker:octeon:
   when: manual
   allow_failure: true
 
-headers:e50:v2:
+.headers:mipsel:
   image: $CI_REGISTRY_IMAGE:mipsel
   stage: headers
   script:
     - mkdir /build $CI_PROJECT_DIR/headers
     - cd /build
-    - curl -o src.tar.bz2 $E50_SRC_v2
+    - curl -o src.tar.bz2 $SOURCE
     - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz --strip-components 1
-    - make ARCH=mips ubnt_er_e50_defconfig
+    - make ARCH=mips ubnt_er_${DEVICE}_defconfig
     - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- prepare modules_prepare
     - make -j5 ARCH=mips CROSS_COMPILE=mipsel-linux-gnu- vmlinux modules
     - cp Module.symvers $CI_PROJECT_DIR/headers
     - make mrproper
-    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_e50_defconfig
+    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig
     - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mipsel-linux-gnu- modules_prepare
   dependencies:
     - docker:mipsel
   artifacts:
     paths:
       - headers/
+
+headers:e50:v1:
+  extends: .headers:mipsel
+  variables:
+    SOURCE: $E50_SRC_v1
+    DEVICE: e50
+
+headers:e50:v2:
+  extends: .headers:mipsel
+  variables:
+    SOURCE: $E50_SRC_v2
+    DEVICE: e50
 
 .headers:octeon:
   image: $CI_REGISTRY_IMAGE:octeon
@@ -106,11 +118,23 @@ headers:e50:v2:
     paths:
       - headers/
 
+headers:e100:v1:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E100_SRC_v1
+    DEVICE: e100
+
 headers:e100:v2:
   extends: .headers:octeon
   variables:
     SOURCE: $E100_SRC_v2
     DEVICE: e100
+
+headers:e200:v1:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E200_SRC_v1
+    DEVICE: e200
 
 headers:e200:v2:
   extends: .headers:octeon
@@ -118,11 +142,23 @@ headers:e200:v2:
     SOURCE: $E200_SRC_v2
     DEVICE: e200
 
+headers:e300:v1:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E300_SRC_v1
+    DEVICE: e300
+
 headers:e300:v2:
   extends: .headers:octeon
   variables:
     SOURCE: $E300_SRC_v2
     DEVICE: e300
+
+headers:e1000:v1:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E1000_SRC_v1
+    DEVICE: e1000
 
 headers:e1000:v2:
   extends: .headers:octeon
