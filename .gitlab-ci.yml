@@ -64,8 +64,6 @@ headers:e50:v2:
   image: $CI_REGISTRY_IMAGE:mipsel
   stage: headers
   script:
-    - apt-get -y update
-    - apt-get -y install bc bison flex git
     - mkdir /build $CI_PROJECT_DIR/headers
     - cd /build
     - curl -o src.tar.bz2 $E50_SRC_v2
@@ -84,3 +82,50 @@ headers:e50:v2:
   artifacts:
     paths:
       - headers/
+
+.headers:octeon:
+  image: $CI_REGISTRY_IMAGE:octeon
+  stage: headers
+  script:
+    - mkdir /build $CI_PROJECT_DIR/headers
+    - cd /build
+    - curl -o src.tar.bz2 $SOURCE
+    - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
+    - mv kernel_* kernel.tar.gz
+    - tar -xf kernel.tar.gz --strip-components 1
+    - make ARCH=mips ubnt_er_${DEVICE}_defconfig
+    - make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- prepare modules_prepare
+    - make -j5 ARCH=mips CROSS_COMPILE=mips64-octeon-linux- vmlinux modules
+    - cp Module.symvers $CI_PROJECT_DIR/headers
+    - make mrproper
+    - make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig
+    - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=mips64-octeon-linux- modules_prepare
+  dependencies:
+    - docker:octeon
+  artifacts:
+    paths:
+      - headers/
+
+headers:e100:v2:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E100_SRC_v2
+    DEVICE: e100
+
+headers:e200:v2:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E200_SRC_v2
+    DEVICE: e200
+
+headers:e300:v2:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E300_SRC_v2
+    DEVICE: e300
+
+headers:e1000:v2:
+  extends: .headers:octeon
+  variables:
+    SOURCE: $E1000_SRC_v2
+    DEVICE: e1000
