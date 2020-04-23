@@ -73,12 +73,13 @@ docker:octeon:
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz --strip-components 1
     - if [ $VERSION -ne 1 ]; then make ARCH=mips ubnt_er_${DEVICE}_defconfig; fi;
+    - if [ $VERSION -eq 1 ]; then cp .config ui.config; fi;
     - make -j5 ARCH=mips CROSS_COMPILE=$CROSS prepare modules_prepare
     - make -j5 ARCH=mips CROSS_COMPILE=$CROSS vmlinux modules
     - cp Module.symvers $CI_PROJECT_DIR/headers
     - make mrproper
     - if [ $VERSION -ne 1 ]; then make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig; fi;
-    - if [ $VERSION -eq 1 ]; then make oldconfig; fi;
+    - if [ $VERSION -eq 1 ]; then mv ui.config .config; fi;
     - make -j5 ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=$CROSS modules_prepare
   artifacts:
     paths:
