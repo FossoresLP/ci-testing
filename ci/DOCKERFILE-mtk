@@ -33,7 +33,7 @@ ARG TARGET=mipsel-mtk-linux
 
 ENV PATH="/opt/cross/bin:${PATH}"
 
-COPY mtk-toolchain.sh /build_toolchain.sh
+COPY ci/mtk-toolchain.sh /build_toolchain.sh
 
 RUN chmod +x /build_toolchain.sh && /build_toolchain.sh
 

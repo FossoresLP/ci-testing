@@ -1,0 +1,44 @@
+docker:mipsel:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:mipsel" -f ci/DOCKERFILE-mipsel .
+    - docker push "$CI_REGISTRY_IMAGE:mipsel"
+  only:
+    - master
+  when: manual
+  allow_failure: true
+
+docker:mtk:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:mtk" -f ci/DOCKERFILE-mtk .
+    - docker push "$CI_REGISTRY_IMAGE:mtk"
+  only:
+    - master
+  when: manual
+  allow_failure: true
+
+docker:octeon:
+  image: docker:latest
+  stage: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:octeon" -f ci/DOCKERFILE-octeon .
+    - docker push "$CI_REGISTRY_IMAGE:octeon"
+  only:
+    - master
+  when: manual
+  allow_failure: true
