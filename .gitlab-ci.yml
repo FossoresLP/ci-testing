@@ -18,6 +18,7 @@ variables:
 stages:
   - docker
   - headers
+  - module-prepare
   - module
   - tools
 
@@ -214,7 +215,7 @@ headers:ugwxg:
 # Module preparation
 module:prepare:
   image: buildpack-deps:bionic
-  stage: module
+  stage: module-prepare
   needs: []
   script:
     - git clone -b $MODULE_VERSION git://git.zx2c4.com/wireguard-linux-compat $CI_PROJECT_DIR/module
@@ -224,7 +225,7 @@ module:prepare:
     - sed -i 's/ --dirty//g' src/Makefile
   artifacts:
     paths:
-      - module
+      - module/src
 
 # Module build templates
 .module:mtk:
