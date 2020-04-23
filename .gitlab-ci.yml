@@ -213,7 +213,7 @@ headers:ugwxg:
 
 # Module preparation
 module:prepare:
-  image: ubuntu
+  image: buildpack-deps:bionic-scm
   stage: module
   needs: []
   script:
