@@ -18,6 +18,7 @@ module:prepare:
   image: $CI_REGISTRY_IMAGE:mtk
   stage: module
   script:
+    - ln $CI_PROJECT_DIR /build
     - cd $CI_PROJECT_DIR/module/src
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- KERNELDIR=$CI_PROJECT_DIR/headers module
     - mipsel-mtk-linux-strip --strip-debug wireguard.ko
@@ -29,6 +30,7 @@ module:prepare:
   image: $CI_REGISTRY_IMAGE:octeon
   stage: module
   script:
+    - ln $CI_PROJECT_DIR /build
     - cd $CI_PROJECT_DIR/module/src
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=$CI_PROJECT_DIR/headers module
     - mips64-octeon-linux-strip --strip-debug wireguard.ko
@@ -48,7 +50,7 @@ module:e50:v1:
 module:e50:v2:
   extends: .module:mtk
   needs:
-    - job: headers:e50:v1
+    - job: headers:e50:v2
       artifacts: true
     - job: module:prepare
       artifacts: true
