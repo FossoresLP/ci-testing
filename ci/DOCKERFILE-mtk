@@ -19,6 +19,7 @@ RUN apt-get update && \
 	libmpfr-dev \
 	libtool \
 	texinfo \
+	cpio \
 	wget && \
 	rm -rf /var/lib/apt/lists/*
 
