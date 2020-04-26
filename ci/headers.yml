@@ -14,7 +14,8 @@
     - cp Module.symvers $CI_PROJECT_DIR/headers
     - make mrproper
     - if [ $VERSION -ne 1 ]; then make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j$(nproc) ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=$CROSS modules_prepare
+	- make -j$(nproc) ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=$CROSS modules_prepare
+	- echo "$CI_PROJECT_DIR/headers" > $CI_PROJECT_DIR/headers/source
   artifacts:
     paths:
       - headers/
