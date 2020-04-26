@@ -1,21 +1,25 @@
 .headers:base:
   stage: headers
   script:
-    - mkdir /build $CI_PROJECT_DIR/headers
+    - export hdir=$CI_PROJECT_DIR/headers
+    - mkdir /build $hdir
     - cd /build
     - curl -o src.tar.bz2 $SOURCE
     - tar -xf src.tar.bz2 --wildcards 'source/kernel_*' --strip-components 1
     - mv kernel_* kernel.tar.gz
     - tar -xf kernel.tar.gz --strip-components 1
     - if [ $VERSION -ne 1 ]; then make ARCH=mips ubnt_er_${DEVICE}_defconfig; fi;
-    - if [ $VERSION -eq 1 ]; then cp .config $CI_PROJECT_DIR/headers/.config; fi;
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=$CROSS prepare modules_prepare
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=$CROSS vmlinux modules
-    - cp Module.symvers $CI_PROJECT_DIR/headers
-    - make mrproper
-    - if [ $VERSION -ne 1 ]; then make ARCH=mips O=$CI_PROJECT_DIR/headers ubnt_er_${DEVICE}_defconfig; fi;
-    - make -j$(nproc) ARCH=mips O=$CI_PROJECT_DIR/headers CROSS_COMPILE=$CROSS modules_prepare
-    - rm $CI_PROJECT_DIR/headers/source
+    - cp Module.symvers .config $hdir
+    - make -j$(nproc) ARCH=mips O=$hdir CROSS_COMPILE=$CROSS syncconfig prepare modules_prepare scripts
+    - rm $hdir/source $hdir/Makefile
+    # This is from alpine linux who in turn got it from
+    # http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
+    - cd "$srcdir"/linux-$_kernver
+    - find . -path './include/*' -prune -o -path './scripts/*' -prune -o -type f \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o -name '*.sh' -o -name '*.pl' -o -name '*.lds' -o -name 'Platform' \) -print | cpio -pdm "$hdir"
+    - cp -a scripts include "$hdir"
+    - find $(find arch -name include -type d -print) -type f | cpio -pdm "$hdir"
   artifacts:
     paths:
       - headers/

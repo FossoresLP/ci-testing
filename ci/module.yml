@@ -18,7 +18,6 @@ module:prepare:
   image: $CI_REGISTRY_IMAGE:mtk
   stage: module
   script:
-    - ln -s $CI_PROJECT_DIR /build
     - cd $CI_PROJECT_DIR/module/src
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=mipsel-mtk-linux- KERNELDIR=$CI_PROJECT_DIR/headers module
     - mipsel-mtk-linux-strip --strip-debug wireguard.ko
@@ -30,7 +29,6 @@ module:prepare:
   image: $CI_REGISTRY_IMAGE:octeon
   stage: module
   script:
-    - ln -s $CI_PROJECT_DIR /build
     - cd $CI_PROJECT_DIR/module/src
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=mips64-octeon-linux- KERNELDIR=$CI_PROJECT_DIR/headers module
     - mips64-octeon-linux-strip --strip-debug wireguard.ko
