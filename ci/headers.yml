@@ -12,7 +12,7 @@
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=$CROSS prepare modules_prepare
     - make -j$(nproc) ARCH=mips CROSS_COMPILE=$CROSS vmlinux modules
     - cp Module.symvers .config $hdir
-    - make -j$(nproc) ARCH=mips O=$hdir CROSS_COMPILE=$CROSS syncconfig prepare modules_prepare scripts
+    - make -j$(nproc) ARCH=mips O=$hdir CROSS_COMPILE=$CROSS prepare modules_prepare scripts
     - rm $hdir/source $hdir/Makefile
     # This is from alpine linux who in turn got it from
     # http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
