@@ -17,7 +17,6 @@
     - rm $hdir/source $hdir/Makefile
     # This is from alpine linux who in turn got it from
     # http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
-    - cd "$srcdir"/linux-$_kernver
     - find . -path './include/*' -prune -o -path './scripts/*' -prune -o -type f \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o -name '*.sh' -o -name '*.pl' -o -name '*.lds' -o -name 'Platform' \) -print | cpio -pdm "$hdir"
     - cp -a scripts include "$hdir"
     - find $(find arch -name include -type d -print) -type f | cpio -pdm "$hdir"
