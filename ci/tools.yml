@@ -15,7 +15,7 @@
 # Octeon tools
 tools:mips:
   extends: .tools
-  image: $CI_REGISTRY_IMAGE/tools:mips
+  image: lochnair/musl-buildenv:mips # Will be: $CI_REGISTRY_IMAGE/tools:mips
   variables:
     ARCH: mips
     TARGET: "mips-linux-musl"
@@ -23,7 +23,7 @@ tools:mips:
 # MTK tools
 tools:mipsel:
   extends: .tools
-  image: $CI_REGISTRY_IMAGE/tools:mipsel
+  image: lochnair/musl-buildenv:mipsel # Will be: $CI_REGISTRY_IMAGE/tools:mipsel
   variables:
     ARCH: mipsel
     TARGET: "mipsel-linux-musl"
