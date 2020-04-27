@@ -1,4 +1,4 @@
-collect:
+.collect:
   image: debian
   stage: collect
   needs:
