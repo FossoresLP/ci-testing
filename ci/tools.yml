@@ -1,6 +1,7 @@
 # Tools
 .tools:
   stage: tools
+  needs: []
   script:
     - git clone -b $TOOLS_VERSION git://git.zx2c4.com/wireguard-tools $CI_PROJECT_DIR/tools
     - cd $CI_PROJECT_DIR/tools/src

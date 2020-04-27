@@ -6,7 +6,7 @@
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE$IMAGE" -f $DOCKERFILE .
+    - docker build --pull -t "$CI_REGISTRY_IMAGE$IMAGE" -f ci/$DOCKERFILE .
     - docker push "$CI_REGISTRY_IMAGE$IMAGE"
   only:
     - master
