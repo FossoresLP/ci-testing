@@ -13,12 +13,14 @@
 
 # Octeon tools
 tools:mips:
+  extends: .tools
   image: $CI_REGISTRY_IMAGE/tools:mips
   variables:
     ARCH: mips
 
 # MTK tools
 tools:mipsel:
+  extends: .tools
   image: $CI_REGISTRY_IMAGE/tools:mipsel
   variables:
     ARCH: mipsel
