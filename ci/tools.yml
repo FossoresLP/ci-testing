@@ -5,8 +5,8 @@
   script:
     - git clone -b $TOOLS_VERSION git://git.zx2c4.com/wireguard-tools $CI_PROJECT_DIR/tools
     - cd $CI_PROJECT_DIR/tools/src
-    - CC="mips-linux-musl-gcc" LDLIBS="-static" make -j$(nproc)
-    - mips-linux-musl-strip --strip-unneeded wg
+    - CC="$ARCH-linux-musl-gcc" LDLIBS="-static" make -j$(nproc)
+    - $ARCH-linux-musl-strip --strip-unneeded wg
   artifacts:
     name: wg-$ARCH
     paths:
@@ -15,7 +15,7 @@
 # Octeon tools
 tools:mips:
   extends: .tools
-  image: lochnair/musl-buildenv:mips # Will be: $CI_REGISTRY_IMAGE/tools:mips
+  image: $CI_REGISTRY_IMAGE/tools:mips
   variables:
     ARCH: mips
     TARGET: "mips-linux-musl"
@@ -23,7 +23,7 @@ tools:mips:
 # MTK tools
 tools:mipsel:
   extends: .tools
-  image: lochnair/musl-buildenv:mipsel # Will be: $CI_REGISTRY_IMAGE/tools:mipsel
+  image: $CI_REGISTRY_IMAGE/tools:mipsel
   variables:
     ARCH: mipsel
     TARGET: "mipsel-linux-musl"

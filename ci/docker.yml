@@ -45,6 +45,7 @@ docker:tools:mips:
     IMAGE: "/tools:mips"
     DOCKERFILE: DOCKERFILE-tools
     ARCH: mips
+    TARGET: "mips-linux-musl"
 
 # MTK tools environment
 docker:tools:mipsel:
@@ -53,3 +54,4 @@ docker:tools:mipsel:
     IMAGE: "/tools:mipsel"
     DOCKERFILE: DOCKERFILE-tools
     ARCH: mipsel
+    TARGET: "mipsel-linux-musl"
