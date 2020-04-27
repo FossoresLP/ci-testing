@@ -22,6 +22,7 @@ stages:
   - module
   - tools
   - package
+  - collect
 
 include:
   - local: "ci/docker.yml"
@@ -29,3 +30,4 @@ include:
   - local: "ci/module.yml"
   - local: "ci/tools.yml"
   - local: "ci/package.yml"
+  - local: "ci/collect.yml"
