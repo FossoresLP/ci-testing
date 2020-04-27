@@ -18,6 +18,7 @@ tools:mips:
   image: $CI_REGISTRY_IMAGE/tools:mips
   variables:
     ARCH: mips
+    TARGET: "mips-linux-musl"
 
 # MTK tools
 tools:mipsel:
@@ -25,3 +26,4 @@ tools:mipsel:
   image: $CI_REGISTRY_IMAGE/tools:mipsel
   variables:
     ARCH: mipsel
+    TARGET: "mipsel-linux-musl"
