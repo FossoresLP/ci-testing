@@ -21,9 +21,11 @@ stages:
   - module-prepare
   - module
   - tools
+  - package
 
 include:
   - local: "ci/docker.yml"
   - local: "ci/headers.yml"
   - local: "ci/module.yml"
   - local: "ci/tools.yml"
+  - local: "ci/package.yml"

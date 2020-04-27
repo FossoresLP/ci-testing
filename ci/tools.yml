@@ -1,24 +1,24 @@
 # Tools
-.tools:mtk:
-  image: $CI_REGISTRY_IMAGE:mtk
+.tools:
+  stage: tools
   script:
-    - git clone -b v1.0.20200206 git://git.zx2c4.com/wireguard-tools $CI_PROJECT_DIR/tools
+    - git clone -b $TOOLS_VERSION git://git.zx2c4.com/wireguard-tools $CI_PROJECT_DIR/tools
     - cd $CI_PROJECT_DIR/tools/src
     - CC="mips-linux-musl-gcc" LDLIBS="-static" make -j$(nproc)
     - mips-linux-musl-strip --strip-unneeded wg
   artifacts:
-    name: wg-mtk
+    name: wg-$ARCH
     paths:
       - tools/src/wg
 
-.tools:octeon:
-  image: $CI_REGISTRY_IMAGE:octeon
-  script:
-    - git clone -b v1.0.20200206 git://git.zx2c4.com/wireguard-tools $CI_PROJECT_DIR/tools
-    - cd $CI_PROJECT_DIR/tools/src
-    - CC="mips-linux-musl-gcc" LDLIBS="-static" make -j$(nproc)
-    - mips-linux-musl-strip --strip-unneeded wg
-  artifacts:
-    name: wg-mtk
-    paths:
-      - tools/src/wg
+# Octeon tools
+tools:mips:
+  image: $CI_REGISTRY_IMAGE/tools:mips
+  variables:
+    ARCH: mips
+
+# MTK tools
+tools:mipsel:
+  image: $CI_REGISTRY_IMAGE/tools:mipsel
+  variables:
+    ARCH: mipsel

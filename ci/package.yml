@@ -1,0 +1,28 @@
+.package:
+  image: debian
+  stage: package
+  script:
+    - apt update
+    - apt install -y gawk kmod
+    - export KERNEL=$(modinfo -F vermagic module/src/wireguard.ko | awk '{print $1;}')
+    - mkdir -p pkg/usr/bin pkg/lib/modules/$KERNEL/kernel/net
+    - cp -r debian pkg/debian
+    - cp -r opt pkg/opt
+    - cp module/src/wireguard.ko pkg/lib/modules/$KERNEL/kernel/net/wireguard.ko
+    - cp tools/src/wg pkg/usr/bin/wg
+    - dpkg-deb -b pkg
+    - mv pkg.deb $DEVICE-$SOFTWARE-$MODULE_VERSION-$TOOLS_VERSION.deb
+  artifacts:
+    paths:
+      - "*.deb"
+
+package:e50:v1:
+  extends: .package
+  needs:
+    - job: module:e50:v1
+      artifacts: true
+    - job: tools:mipsel
+      artifacts: true
+  variables:
+    DEVICE: e50
+    SOFTWARE: v1
